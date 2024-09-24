@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const UploadScreen = () => {
   const [image, setImage] = useState(null);
   const [symptoms, setSymptoms] = useState('');
+  const [uploadMessage, setUploadMessage] = useState('');
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -24,6 +25,15 @@ const UploadScreen = () => {
 
     if (!result.canceled) {
       setImage(result.uri);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (symptoms.trim()) {
+      setUploadMessage('Upload successful!');
+      // Add your upload logic here
+    } else {
+      setUploadMessage('Please enter symptoms.');
     }
   };
 
@@ -50,14 +60,15 @@ const UploadScreen = () => {
           <Text style={styles.symptomsLabel}>Symptoms</Text>
           <TextInput
             style={styles.symptomsInput}
-            placeholder="Type the symptoms here"
+            placeholder="Describe the symptoms in detail..."
             value={symptoms}
             onChangeText={setSymptoms}
             multiline
           />
-          <TouchableOpacity style={styles.uploadSymptomsButton}>
-            <Text style={styles.uploadSymptomsButtonText}>Upload</Text>
+          <TouchableOpacity style={styles.uploadSymptomsButton} onPress={handleSubmit}>
+            <Text style={styles.uploadSymptomsButtonText}>Submit Symptoms</Text>
           </TouchableOpacity>
+          {uploadMessage ? <Text style={styles.uploadMessage}>{uploadMessage}</Text> : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -71,17 +82,15 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 10,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
+    paddingTop: 20,
+    alignItems: 'flex-start', // Align items to the left
     justifyContent: 'center',
   },
   headerText: {
-    fontSize: 26,
+    fontSize: 30, // Increased font size
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 30,
-    fontFamily: 'Poppins-SemiBold',
+    textAlign: 'left', // Align text to the left
+    marginBottom: 20,
     color: '#333333',
   },
   imageUploadContainer: {
@@ -91,8 +100,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   uploadButton: {
-    width: 180,
-    height: 180,
+    width: 200, // Increased width
+    height: 200, // Increased height
     borderRadius: 15,
     borderWidth: 2,
     borderColor: '#E0E0E0',
@@ -122,10 +131,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     borderRadius: 10,
     marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
     elevation: 3,
   },
   uploadImageButtonText: {
@@ -150,7 +155,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    fontFamily: 'Poppins-SemiBold',
     color: '#333333',
   },
   symptomsInput: {
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     fontSize: 14,
-    color: '#888888',
+    color: '#333333',
     textAlignVertical: 'top',
   },
   uploadSymptomsButton: {
@@ -170,16 +174,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
     elevation: 3,
   },
   uploadSymptomsButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  uploadMessage: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#4CAF50',
     textAlign: 'center',
   },
 });
