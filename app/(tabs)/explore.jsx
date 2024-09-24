@@ -2,27 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Sample disease categories (use real data in production)
 const categories = [
-  { id: '1', name: 'Cereals', image: require('../../assets/images/cereals.jpeg'), details: 'Common diseases in cereals include rust, smut, and leaf blight. These can reduce yield and grain quality if left untreated.' },
-  { id: '2', name: 'Cows Disease', image: require('../../assets/images/cowsdisease.jpg'), details: 'Cattle diseases include mastitis, foot-and-mouth disease, and anthrax. Early detection and treatment can prevent outbreaks.' },
-  { id: '3', name: 'Sheep Diseases', image: require('../../assets/images/sheepdisease.jpg'), details: 'Sheep are prone to diseases such as foot rot, blue tongue, and sheep scab. These diseases can affect wool quality and animal health.' },
-  { id: '4', name: 'Fruit Diseases', image: require('../../assets/images/fruitdiseases.jpeg'), details: 'Fruit crops can be affected by diseases like powdery mildew, citrus canker, and fire blight. These diseases can spoil harvests.' },
-  { id: '5', name: 'Poultry Diseases', image: require('../../assets/images/poultry.png'), details: 'Poultry are vulnerable to diseases such as avian influenza, Newcastle disease, and coccidiosis. Proper biosecurity can prevent them.' },
-  { id: '6', name: 'Soil Health', image: require('../../assets/images/soil.jpg'), details: 'Soil health is critical to crop success. Issues like soil-borne diseases (e.g., nematodes, fungi) can degrade soil quality over time.' },
-  { id: '7', name: 'Insect Pests', image: require('../../assets/images/insect.png'), details: 'Insect pests like aphids, whiteflies, and weevils damage crops by sucking sap and spreading disease. Proper pest management is key.' },
-  { id: '8', name: 'Tree Diseases', image: require('../../assets/images/tree.jpg'), details: 'Trees can be affected by diseases such as Dutch elm disease, sudden oak death, and root rot. Tree health impacts forest and fruit production.' },
+  { id: '1', name: 'Cereals', image: require('../../assets/images/cereals.jpeg'), details: 'Common diseases in cereals include rust, smut, and leaf blight.' },
+  { id: '2', name: 'Cows Disease', image: require('../../assets/images/cowsdisease.jpg'), details: 'Cattle diseases include mastitis and foot-and-mouth disease.' },
+  { id: '3', name: 'Sheep Diseases', image: require('../../assets/images/sheepdisease.jpg'), details: 'Sheep are prone to diseases like foot rot and blue tongue.' },
+  { id: '4', name: 'Fruit Diseases', image: require('../../assets/images/fruitdiseases.jpeg'), details: 'Fruit crops can be affected by diseases like powdery mildew.' },
+  { id: '5', name: 'Poultry Diseases', image: require('../../assets/images/poultry.png'), details: 'Poultry are vulnerable to diseases like avian influenza.' },
+  { id: '6', name: 'Soil Health', image: require('../../assets/images/soil.jpg'), details: 'Soil health is critical to crop success.' },
+  { id: '7', name: 'Insect Pests', image: require('../../assets/images/insect.png'), details: 'Insect pests like aphids damage crops.' },
+  { id: '8', name: 'Tree Diseases', image: require('../../assets/images/tree.jpg'), details: 'Trees can be affected by diseases like Dutch elm disease.' },
 ];
 
 const categoryColors = {
-  'Cereals': '#FFEB3B',  // Yellow
-  'Cows Disease': '#FFCDD2',  // Light Red
-  'Sheep Diseases': '#BBDEFB',  // Light Blue
-  'Fruit Diseases': '#A5D6A7',  // Light Green
-  'Poultry Diseases': '#F8BBD0',  // Pink
-  'Soil Health': '#FFECB3',  // Light Yellow
-  'Insect Pests': '#FFE0B2',  // Orange
-  'Tree Diseases': '#C5E1A5',  // Light Green
+  'Cereals': '#C6DAB6',  // Soft Olive Green
+  'Cows Disease': '#F2B2B2',  // Soft Salmon Pink
+  'Sheep Diseases': '#A4C8E1',  // Sky Blue
+  'Fruit Diseases': '#D4E8B3',  // Light Mint Green
+  'Poultry Diseases': '#F6D1D1',  // Peach
+  'Soil Health': '#E3D49B',  // Pale Tan
+  'Insect Pests': '#F3CBA0',  // Light Coral
+  'Tree Diseases': '#C2E1D4',  // Minty Green
 };
 
 const Explore = () => {
@@ -32,7 +31,6 @@ const Explore = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching data (categories)
     setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -50,7 +48,6 @@ const Explore = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header with Search Bar */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Find Disease</Text>
           <TextInput
@@ -62,20 +59,21 @@ const Explore = () => {
           />
         </View>
 
-        {/* Loading Indicator */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#4CAF50" />
+            <ActivityIndicator size="large" color="#53B175" />
           </View>
         ) : (
           <>
-            {/* Categories */}
             <Text style={styles.sectionTitle}>Disease Categories</Text>
             {filteredCategories.length > 0 ? (
               <FlatList
                 data={filteredCategories}
                 renderItem={({ item }) => (
-                  <TouchableOpacity style={[styles.categoryCard, { backgroundColor: categoryColors[item.name] }]} onPress={() => handleCategoryPress(item)}>
+                  <TouchableOpacity
+                    style={[styles.categoryCard, { backgroundColor: categoryColors[item.name] }]}
+                    onPress={() => handleCategoryPress(item)}
+                  >
                     <Image source={item.image} style={styles.categoryImage} />
                     <Text style={styles.categoryText}>{item.name}</Text>
                   </TouchableOpacity>
@@ -90,7 +88,6 @@ const Explore = () => {
           </>
         )}
 
-        {/* Modal for Category Info */}
         <Modal
           visible={modalVisible}
           transparent={true}
@@ -201,6 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     marginBottom: 20,
+    color: '#333',
   },
   modalImage: {
     width: 200,
@@ -215,7 +213,7 @@ const styles = StyleSheet.create({
   },
   modalCloseButton: {
     fontSize: 16,
-    color: '#007BFF',
+    color: '#53B175',
     marginTop: 20,
   },
   noResultsText: {
