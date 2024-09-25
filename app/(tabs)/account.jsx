@@ -52,7 +52,7 @@ export default function Account({ navigation }) {
         <Text style={styles.menuText}>About</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Contributions')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('community')}>
         <Icon name="wifi" size={24} color="#000" />
         <Text style={styles.menuText}>Your Contributions</Text>
       </TouchableOpacity>
