@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { Redirect, router } from 'expo-router';
 
 const data = [
   {
@@ -93,7 +93,6 @@ const data = [
 
 const Community = () => {
   const [search, setSearch] = useState('');
-  const navigation = useNavigation(); // Hook to navigate
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>
@@ -142,7 +141,7 @@ const Community = () => {
         {/* Pen Button for Asking Community */}
         <TouchableOpacity
           style={styles.penButton}
-          onPress={() => navigation.navigate('forum')}
+          onPress={() => router.push('/addcommunity')}
         >
           <Ionicons name="create" size={30} color="white" />
         </TouchableOpacity>
