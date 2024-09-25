@@ -1,13 +1,70 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as tf from '@tensorflow/tfjs'; // Import TensorFlow.js
+import * as tflite from '@tensorflow/tfjs-tflite'; // TensorFlow Lite support
+import { decodeJpeg, resizeBilinear, expandDims } from '@tensorflow/tfjs-react-native';
+import { useRouter } from 'expo-router';
+import * as FileSystem from 'expo-file-system'; // To handle file paths
 
 const UploadScreen = () => {
   const [image, setImage] = useState(null);
   const [symptoms, setSymptoms] = useState('');
   const [uploadMessage, setUploadMessage] = useState('');
+  const [model, setModel] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter(); // Using expo-router
+
+  // Define a basic tokenizer setup
+  const wordIndex = {
+    'panama': 1,
+    'disease': 2,
+    'spread': 3,
+    'symptoms': 4,
+    'banana': 5,
+    // Add more mappings here
+  };
+
+  // Function to tokenize input symptoms
+  const tokenizeSymptoms = (symptomsText) => {
+    const words = symptomsText.trim().toLowerCase().split(/\s+/);
+    const tokenized = words.map(word => wordIndex[word] || 0); // 0 for unknown words
+    return tokenized;
+  };
+
+  // Function to pad sequences
+  const padSequences = (sequence, maxLength) => {
+    while (sequence.length < maxLength) {
+      sequence.push(0);
+    }
+    if (sequence.length > maxLength) {
+      sequence = sequence.slice(0, maxLength);
+    }
+    return sequence;
+  };
+
+  // Loading the .tflite model
+  useEffect(() => {
+    const loadModel = async () => {
+      setLoading(true);
+      try {
+        const modelPath = await FileSystem.downloadAsync(
+          require('../assets/model.tflite'), // Ensure your model is in the assets folder
+          FileSystem.documentDirectory + 'model.tflite'
+        );
+        const loadedModel = await tflite.loadTFLiteModel(modelPath.uri);
+        setModel(loadedModel);
+      } catch (error) {
+        console.error('Error loading model:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadModel();
+  }, []);
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -28,12 +85,71 @@ const UploadScreen = () => {
     }
   };
 
-  const handleSubmit = () => {
-    if (symptoms.trim()) {
-      setUploadMessage('Upload successful!');
-      // Add your upload logic here
-    } else {
+  // Function to convert image to tensor
+  const imageToTensor = async (uri) => {
+    const response = await fetch(uri);
+    const imageData = await response.arrayBuffer();
+    const imageTensor = decodeJpeg(new Uint8Array(imageData));
+    
+    // Resize image to match model input size, for example (224, 224)
+    const resizedImageTensor = resizeBilinear(imageTensor, [224, 224]);
+    
+    // Add a batch dimension for the model: [1, height, width, 3]
+    const expandedTensor = expandDims(resizedImageTensor, 0);
+    return expandedTensor;
+  };
+
+  const processImage = async () => {
+    if (!image) {
+      alert('Please upload or take an image.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const imgTensor = await imageToTensor(image); // Convert image to Tensor
+      const prediction = model.predict(imgTensor);  // Run prediction using .tflite model
+      const result = await prediction.data();       // Get the result
+      router.push({ pathname: '/output', params: { result: result[0] } }); // Navigate to OutputScreen with result
+    } catch (error) {
+      console.error('Error during prediction:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const processSymptoms = async () => {
+    if (!symptoms.trim()) {
       setUploadMessage('Please enter symptoms.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Tokenize and pad symptoms input
+      const tokenizedSymptoms = tokenizeSymptoms(symptoms);
+      const maxLength = 50; // Set your model's required sequence length
+      const paddedSymptoms = padSequences(tokenizedSymptoms, maxLength);
+
+      // Convert to tensor
+      const inputTensor = tf.tensor2d([paddedSymptoms], [1, maxLength]);
+
+      // Predict using the model
+      const prediction = model.predict(inputTensor);
+      const result = await prediction.data();
+      router.push({ pathname: '/output', params: { result: result[0] } }); // Navigate to OutputScreen with result
+    } catch (error) {
+      console.error('Error during prediction:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (image) {
+      processImage(); // Process the uploaded image
+    } else if (symptoms.trim()) {
+      processSymptoms(); // Process the symptoms text input
     }
   };
 
@@ -41,6 +157,8 @@ const UploadScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.headerText}>Upload</Text>
+
+        {loading ? <ActivityIndicator size="large" color="#4CAF50" /> : null}
 
         <View style={styles.imageUploadContainer}>
           <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
@@ -76,6 +194,7 @@ const UploadScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  // Styling remains the same
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -83,13 +202,13 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    alignItems: 'flex-start', // Align items to the left
+    alignItems: 'flex-start',
     justifyContent: 'center',
   },
   headerText: {
-    fontSize: 30, // Increased font size
+    fontSize: 30,
     fontWeight: 'bold',
-    textAlign: 'left', // Align text to the left
+    textAlign: 'left',
     marginBottom: 20,
     color: '#333333',
   },
@@ -100,8 +219,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   uploadButton: {
-    width: 200, // Increased width
-    height: 200, // Increased height
+    width: 200,
+    height: 200,
     borderRadius: 15,
     borderWidth: 2,
     borderColor: '#E0E0E0',
