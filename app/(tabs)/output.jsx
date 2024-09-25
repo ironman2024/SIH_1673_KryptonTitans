@@ -2,19 +2,42 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSearchParams } from 'expo-router';
+import Tflite from 'tflite-react-native';
 
 const OutputScreen = () => {
-  const { result } = useSearchParams(); // Retrieve result from params
+  const { result } = useSearchParams();
   const [formattedResult, setFormattedResult] = useState('');
+  const [tflite, setTflite] = useState(null);
 
   useEffect(() => {
-    // Assume the result is a probability or class index from the model.
-    // You can replace this part with actual mapping logic based on your model's output.
+    // Load the TFLite model
+    const loadModel = async () => {
+      const model = new Tflite();
+      await model.loadModel({
+        model: 'path_to_your_model.tflite', // Ensure this is the correct path to your model
+        numThreads: 1, // Number of threads for inference
+      }, (error, res) => {
+        if (error) {
+          console.error('Error loading model: ', error);
+        } else {
+          setTflite(model);
+        }
+      });
+    };
+
+    loadModel();
+
+    return () => {
+      if (tflite) {
+        tflite.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const generateResultMessage = (modelResult) => {
       let message = '';
-
       if (typeof modelResult === 'number') {
-        // For demonstration, let's assume the model returns a probability or class index:
         if (modelResult > 0.8) {
           message = 'The crop is highly likely to be diseased. Please take immediate action.';
         } else if (modelResult > 0.5) {
@@ -23,20 +46,27 @@ const OutputScreen = () => {
           message = 'The crop seems to be healthy.';
         }
       } else if (typeof modelResult === 'string') {
-        // If the result is a string (like a disease name), handle it here.
         message = `The prediction suggests that the crop is affected by ${modelResult}.`;
       } else {
         message = 'Unable to determine the crop status. Please try again.';
       }
-
       return message;
     };
 
-    if (result) {
-      const message = generateResultMessage(result);
-      setFormattedResult(message); // Set the grammatically correct message
+    if (result && tflite) {
+      // Prepare your input (e.g., image or tensor) and call `runModel`
+      tflite.runModel({
+        path: 'path_to_your_image.jpg', // Example: path to an image or tensor
+      }, (error, res) => {
+        if (error) {
+          console.error('Error running model: ', error);
+        } else {
+          const message = generateResultMessage(res);
+          setFormattedResult(message);
+        }
+      });
     }
-  }, [result]);
+  }, [result, tflite]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
