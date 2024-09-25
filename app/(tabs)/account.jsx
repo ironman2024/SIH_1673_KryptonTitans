@@ -32,7 +32,7 @@ export default function Account({ navigation }) {
         <Text style={styles.menuText}>Farm Location</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Calendar')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('calendar')}>
         <Icon name="calendar-today" size={24} color="#000" />
         <Text style={styles.menuText}>Calendar</Text>
       </TouchableOpacity>
