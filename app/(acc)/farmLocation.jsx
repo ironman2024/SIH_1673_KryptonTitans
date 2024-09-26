@@ -17,6 +17,8 @@ export default function farmLocation() {
             return;
         }
         let location=await Location.getCurrentPositionAsync({enableHighAccuracy:true})
+        let address=await Location.reverseGeocodeAsync(location.coords)
+        console.log(address);
         setMapRegion({
             latitude:location.coords.latitude,
             longitude:location.coords.longitude,
