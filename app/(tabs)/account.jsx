@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';  // Import useRouter from expo-router
 
-export default function Account({ navigation }) {
+export default function Account() {
+  const router = useRouter();  // Use useRouter hook for navigation
 
   return (
     <ScrollView style={styles.container}>
@@ -22,37 +24,37 @@ export default function Account({ navigation }) {
       </View>
 
       {/* Settings Options */}
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Details')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/details')}>
         <Icon name="person" size={24} color="#000" />
         <Text style={styles.menuText}>My Details</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('FarmLocation')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/farmLocation')}>
         <Icon name="place" size={24} color="#000" />
         <Text style={styles.menuText}>Farm Location</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('calendar')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/calendar')}>
         <Icon name="calendar-today" size={24} color="#000" />
         <Text style={styles.menuText}>Calendar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Notifications')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/notifications')}>
         <Icon name="notifications" size={24} color="#000" />
         <Text style={styles.menuText}>Notifications</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Help')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/help')}>
         <Icon name="help" size={24} color="#000" />
         <Text style={styles.menuText}>Help</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('About')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/about')}>
         <Icon name="info" size={24} color="#000" />
         <Text style={styles.menuText}>About</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('community')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/community')}>
         <Icon name="wifi" size={24} color="#000" />
         <Text style={styles.menuText}>Your Contributions</Text>
       </TouchableOpacity>
