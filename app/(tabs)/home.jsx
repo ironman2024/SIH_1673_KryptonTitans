@@ -3,11 +3,22 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, router } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
 
 const HomeScreen = () => {
+  const { user, isLoaded } = useUser();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        <Text style={{
+          fontSize: 24,
+          fontWeight: 'bold',
+          paddingVertical: 20,
+          textAlign:'center',
+          color: '#4caf50',
+        }}>
+         Welcome, {user?.fullName}
+        </Text>
         {/* Top Section: Location */}
         <TopSection />
 

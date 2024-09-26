@@ -1,9 +1,11 @@
 
+import { useUser } from '@clerk/clerk-expo';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
 const LanguageSelection = () => {
 
+  const { user, isLoaded } = useUser();
   
   
   const [selectedLanguage, setSelectedLanguage] = useState(null);
@@ -24,7 +26,7 @@ const LanguageSelection = () => {
         textAlign: 'center',
         color:'#1A4D2E'
       }}>
-        Lassi bhen ke lode 
+       {user?.fullName}
       </Text>
       <Text style={styles.subtitleText}>Select a language:</Text>
       <ScrollView style={styles.scrollView}>

@@ -1,20 +1,24 @@
+import { useUser } from '@clerk/clerk-expo';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function Account({ navigation }) {
 
+  const { user, isLoaded } = useUser();
+  
+
   return (
     <ScrollView style={styles.container}>
       {/* Profile Section */}
       <View style={styles.profileContainer}>
         <Image
-          source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} // Placeholder profile picture
+          source={{ uri: user?.imageUrl }} // Placeholder profile picture
           style={styles.profileImage}
         />
         <View style={styles.profileDetails}>
-          <Text style={styles.profileName}>Varun Damle</Text>
-          <Text style={styles.profilePhone}>+91-8080659456</Text>
+          <Text style={styles.profileName}>{user?.fullName}</Text>
+          <Text style={styles.profilePhone}>{user.emailAddresses[0].emailAddress}</Text>
         </View>
         <TouchableOpacity>
           <Icon name="edit" size={20} color="#4CAF50" />
