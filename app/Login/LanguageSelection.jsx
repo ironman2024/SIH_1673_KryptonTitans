@@ -43,6 +43,9 @@ const LanguageSelection = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+      <TouchableOpacity>
+        <Text style={styles.buttonText}>Next</Text>
+      </TouchableOpacity>
       {selectedLanguage && <Text style={styles.selectedText}>You selected: {selectedLanguage}</Text>}
     </View>
   );
@@ -91,6 +94,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#347928',
   },
+  buttonText:{
+    fontSize: 20,
+    fontWeight: 'bold',
+    backgroundColor: '#347928',
+    padding: 15,
+    borderRadius: 5,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    marginBottom: 20,
+  }
 });
 
 export default LanguageSelection;
