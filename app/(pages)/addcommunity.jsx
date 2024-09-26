@@ -40,38 +40,49 @@ const Community = () => {
     };
 
     const uploadImage = async () => {
-      if (!selectedImage) {
-          alert('Please select an image first!');
-          return;
-      }
-  
-      const uriParts = selectedImage.split('/');
-      const fileName = uriParts[uriParts.length - 1];
-  
-      try {
-          const response = await fetch(selectedImage);  // Fetch the selected image URI
-          const blob = await response.blob();  // Convert image to a blob
-  
-          console.log('Starting upload...');
-          
-          // Log details about the file being uploaded
-          console.log('File Name:', fileName);
-          console.log('Blob Type:', blob.type);
-          console.log('Blob Size:', blob.size);
-  
-          const uploadResponse = await storage.createFile(
-              '66f465130001e7674299', // Replace with your actual bucket ID
-              ID.unique(),
-              blob
-          );
-  
-          console.log('Upload Response:', uploadResponse); // Log successful response
-          setUploadStatus('Image uploaded successfully!');
-      } catch (error) {
-          console.error('Error during upload:', error); // Log detailed error
-          setUploadStatus('Failed to upload image.');
-      }
-  };
+    if (!selectedImage) {
+        alert('Please select an image first!');
+        return;
+    }
+
+    const uriParts = selectedImage.split('/');
+    const fileName = uriParts[uriParts.length - 1];
+
+    try {
+        const response = await fetch(selectedImage);  // Fetch the selected image URI
+        const blob = await response.blob();  // Convert image to a blob
+
+        console.log('Starting upload...');
+        
+        // Log details about the file being uploaded
+        console.log('File Name:', fileName);
+        console.log('Blob Type:', blob.type);
+        console.log('Blob Size:', blob.size);
+
+        // Upload the file to Appwrite storage
+        const uploadResponse = await storage.createFile(
+            '66f465130001e7674299', // Replace with your actual bucket ID
+            ID.unique(),
+            blob
+        );
+
+        console.log('Upload Response:', uploadResponse); // Log successful response
+
+        // Retrieve the fileId from the response
+        const fileId = uploadResponse.$id;
+
+        // Generate a preview URL for the uploaded image
+        const previewUrl = storage.getFilePreview('66f465130001e7674299', fileId);
+        console.log('Preview URL:', previewUrl); // Log the preview URL
+
+        setUploadStatus('Image uploaded successfully!');
+        setSelectedImage(previewUrl);  // Update the selectedImage to display the uploaded image
+
+    } catch (error) {
+        console.error('Error during upload:', error); // Log detailed error
+        setUploadStatus('Failed to upload image.');
+    }
+};
 
     return (
         <Container>
