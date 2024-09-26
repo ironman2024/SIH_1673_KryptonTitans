@@ -55,7 +55,7 @@ const HomeScreen = () => {
 const TopSection = () => (
   <View style={styles.topSectionContainer}>
     <Ionicons name="location-outline" size={28} color="#4CAF50" style={styles.locationIcon} />
-    <Text style={styles.locationText}>Kolhapur, Maharashtra</Text>
+    <Text style={styles.locationText}>Pune, Maharashtra</Text>
   </View>
 );
 
