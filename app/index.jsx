@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
+import { Link } from "expo-router";
+
 
 const Index = () => {
   const router = useRouter();
@@ -10,6 +12,7 @@ const Index = () => {
   };
 
   return (
+    <>
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
       <TouchableOpacity onPress={handleRedirect}>
         <Text style={{ color: 'blue', fontSize: 18, textAlign: 'center', textDecorationLine: 'underline' }}>
@@ -17,6 +20,14 @@ const Index = () => {
         </Text>
       </TouchableOpacity>
     </View>
+    <Link href={'/Login/LoginScreen'}>
+    <Text>
+      Go to Login Page
+    </Text>
+    </Link>
+
+    </>
+    
   );
 };
 
