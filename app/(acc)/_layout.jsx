@@ -7,25 +7,23 @@ const AuthLayout = () => {
     <>
       <Stack>
         <Stack.Screen
-          name='chatbot'
+          name='help'
           options={{
             headerShown: false
-          }}  
-        />
-
-        <Stack.Screen
-          name='addcommunity'
-          options={{
-            headerShown: false
-          }}  
+          }}
         />
         <Stack.Screen
-          name='content'
+          name='calendar'
           options={{
             headerShown: false
           }}  
         />
-        
+        <Stack.Screen
+          name='about'
+          options={{
+            headerShown: false
+          }}  
+        />
       </Stack>
 
       <StatusBar style='dark'/>
