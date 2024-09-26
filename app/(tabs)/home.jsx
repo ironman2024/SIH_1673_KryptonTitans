@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Redirect, router } from 'expo-router';
 
 const HomeScreen = () => {
   return (
@@ -27,6 +28,14 @@ const HomeScreen = () => {
         {/* Contact Helpline Section */}
         <ContactHelpline />
       </ScrollView>
+
+      {/* Floating Chatbot Icon */}
+      <TouchableOpacity
+        style={styles.chatbotButton}
+        onPress={() => router.push('/chatbot')} // Route to chatbot
+      >
+        <Ionicons name="chatbubbles" size={30} color="#FFFFFF" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -339,6 +348,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4CAF50',
     fontFamily: 'Poppins-SemiBold',
+  },
+  chatbotButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#4CAF50',
+    borderRadius: 50,
+    padding: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

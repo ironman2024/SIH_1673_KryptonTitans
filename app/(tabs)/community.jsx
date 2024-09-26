@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Redirect, router } from 'expo-router';
 
 const data = [
   {
@@ -136,6 +137,14 @@ const Community = () => {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
+
+        {/* Pen Button for Asking Community */}
+        <TouchableOpacity
+          style={styles.penButton}
+          onPress={() => router.push('/addcommunity')}
+        >
+          <Ionicons name="create" size={30} color="white" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -223,6 +232,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderRadius: 20,
     padding: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  penButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#4CAF50',
+    borderRadius: 50,
+    padding: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
