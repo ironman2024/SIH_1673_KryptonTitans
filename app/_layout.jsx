@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { View, Text} from 'react-native'
+import { StatusBar } from "expo-status-bar";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,10 +37,14 @@ const RootLayout = () => {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{headerShown: false}} />
-      <Stack.Screen name='(tabs)' options={{ headerShown:false}} />
-    </Stack>
+    <>
+      <Stack>
+        <Stack.Screen name="index" options={{headerShown: false}} />
+        <Stack.Screen name='(tabs)' options={{ headerShown:false}} />
+      </Stack>
+
+      <StatusBar style="dark"/>
+    </>
   )
 }
 

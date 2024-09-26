@@ -5,14 +5,14 @@ import { StatusBar } from 'expo-status-bar'
 const AuthLayout = () => {
   return (
     <>
-      {/* <Stack>
+      <Stack>
         <Stack.Screen
-          name='chatbot'
+          name='indextranslator'
           options={{
             headerShown: false
-          }}  
+          }}
         />
-      </Stack> */}
+      </Stack>
 
       <StatusBar style='dark'/>
     </>

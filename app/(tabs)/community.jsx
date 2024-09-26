@@ -1,151 +1,238 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, TextInput, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, FlatList, Image, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect, router } from 'expo-router';
+import { getStorage, ref, listAll, getDownloadURL, uploadBytes } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
+import { initializeApp } from 'firebase/app';
+import { useRouter } from 'expo-router';
 
-const data = [
-  {
-    id: '1',
-    title: 'Panama Disease Cure',
-    description: 'The most effective tool against Panama disease is the development of banana plants resistant to Fusarium.',
-    contributions: 104,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTha6BOe-NeS7HWl1UawWt08uHZHz2RZpXuaA&s', // Replace with actual image URL
-  },
-  {
-    id: '2',
-    title: 'Panama Disease Spread in Kokan',
-    description: 'Soil-borne fungal disease that spreads through the movement of infected plants, soil, water, and equipment.',
-    contributions: 79,
-    image: 'https://scx2.b-cdn.net/gfx/news/2015/spreadofpana.jpg', // Replace with actual image URL
-  },
-  {
-    id: '3',
-    title: 'Panama Disease Symptoms',
-    description: 'Key symptoms of Panama disease affecting banana plants.',
-    contributions: 56,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXu_4bmXAC5-vLI_knLQmtkgUE9kQcGgVBbw&s', // Replace with actual image URL
-  },
-  {
-    id: '4',
-    title: 'Soil Health Management',
-    description: 'Best practices to improve and maintain soil fertility for long-term crop sustainability.',
-    contributions: 88,
-    image: 'https://www.mindvoice.live/wp-content/uploads/2023/08/Soil-Health-Management-Building-Resilience-and-Productivity-in-Farms.png', // Replace with actual image URL
-  },
-  {
-    id: '5',
-    title: 'Organic Farming Techniques',
-    description: 'Exploring methods to adopt sustainable and eco-friendly farming without synthetic fertilizers or pesticides.',
-    contributions: 120,
-    image: 'https://media.licdn.com/dms/image/v2/C4D12AQHAsi-_H8SCDA/article-inline_image-shrink_1000_1488/article-inline_image-shrink_1000_1488/0/1520066123036?e=1732147200&v=beta&t=95SJchucW41mZKhDkWnqvpQ0qKQinJLPDp7SneGN1V0', // Replace with actual image URL
-  },
-  {
-    id: '6',
-    title: 'Integrated Pest Management (IPM)',
-    description: 'Strategies for managing pests using biological control, cultural practices, and minimal use of chemicals.',
-    contributions: 67,
-    image: 'https://images.squarespace-cdn.com/content/v1/5b15b6b825bf0270b8b4f22a/1631833432057-9R9LVQES4Z20BEG6ZFFU/ARBICO+IPM+1080x1080.jpg', // Replace with actual image URL
-  },
-  {
-    id: '7',
-    title: 'Water Conservation in Agriculture',
-    description: 'Techniques to optimize water use for irrigation and reduce water waste in farming operations.',
-    contributions: 142,
-    image: 'https://vlsci.com/wp-content/uploads/2023/07/shutterstock_243102907-scaled.jpg', // Replace with actual image URL
-  },
-  {
-    id: '8',
-    title: 'Climate-Resilient Crops',
-    description: 'Discussion on developing and planting crop varieties that can withstand extreme weather conditions.',
-    contributions: 98,
-    image: 'https://innovationforum.s3.amazonaws.com/uploads/spina/photo/file/1982/image_dreamstime_s_93420706.jpg', // Replace with actual image URL
-  },
-  {
-    id: '9',
-    title: 'Regenerative Agriculture',
-    description: 'Exploring farming practices that regenerate topsoil, increase biodiversity, and improve water cycles.',
-    contributions: 76,
-    image: 'https://cdn.prod.website-files.com/62e8df21cffc5e12a4b7541b/653a67e09299913eb7601120_Regenerative%20Agriculture.jpg', // Replace with actual image URL
-  },
-  {
-    id: '10',
-    title: 'Crop Rotation for Disease Prevention',
-    description: 'How to implement crop rotation strategies to minimize plant disease outbreaks and improve soil health.',
-    contributions: 65,
-    image: 'https://www.planetnatural.com/wp-content/uploads/2014/01/rotating-crops.jpg', // Replace with actual image URL
-  },
-  {
-    id: '11',
-    title: 'Agroforestry Practices',
-    description: 'Incorporating trees into agricultural systems to improve biodiversity and increase yields.',
-    contributions: 81,
-    image: 'https://media.licdn.com/dms/image/D4D12AQE8WlFLf3wkWg/article-cover_image-shrink_720_1280/0/1691661124483?e=2147483647&v=beta&t=vPUiEbghzDojCnOQs1Deg_nC2-RKwvKEf9Hf3hJU5rY', // Replace with actual image URL
-  },
-  {
-    id: '12',
-    title: 'Greenhouse Farming Innovations',
-    description: 'Latest advancements in greenhouse farming to improve crop yields and protect from environmental factors.',
-    contributions: 110,
-    image: 'https://www.moleaer.com/hubfs/Untitled%20design%20%2813%29.png', // Replace with actual image URL
-  },
-];
+// Firebase client-side config (public)
+const firebaseConfig = {
+  apiKey: "AIzaSyAT-NI6jaIocQ2XOjSmZwDeNEJyng3BV3I",
+  authDomain: "nector-28874.firebaseapp.com",
+  projectId: "nector-28874",
+  storageBucket: "nector-28874.appspot.com",
+  messagingSenderId: "946881652909",
+  appId: "1:946881652909:web:e7a5e3ef224061484c3e24",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 const Community = () => {
   const [search, setSearch] = useState('');
+  const [folders, setFolders] = useState([]);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [title, setTitle] = useState('');
+  const [image, setImage] = useState(null);
+  const [textContent, setTextContent] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchFolders();
+  }, []);
+
+  const fetchFolders = async () => {
+    const storageRef = ref(storage, '/'); // Reference to the root of storage
+    try {
+      const folderList = await listAll(storageRef);
+      const folderNames = folderList.prefixes.map((folder) => folder.name);
+      setFolders(folderNames);
+    } catch (error) {
+      console.error("Error fetching folders:", error);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchFolders();
+    setRefreshing(false);
+  };
+
+  const handleImageChange = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync();
+    
+    if (!result.cancelled) {
+      setImage(result.assets[0]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (image && textContent && title) {
+      const folderRef = ref(storage, `${title}/`);
+
+      try {
+        // Upload Image
+        const imageRef = ref(folderRef, image.fileName);
+        await uploadBytes(imageRef, image.uri);
+        console.log(`${image.fileName} uploaded successfully.`);
+
+        // Upload Raw Text as Blob
+        const textBlob = new Blob([textContent], { type: 'text/plain' });
+        const textRef = ref(folderRef, 'text_content.txt');
+        await uploadBytes(textRef, textBlob);
+        console.log("Text content uploaded successfully.");
+
+        Alert.alert("Upload Successful", "Your image and text have been uploaded.");
+        // Reset state after upload
+        setImage(null);
+        setTextContent('');
+        setTitle('');
+        setModalVisible(false); // Close the modal
+        fetchFolders(); // Refresh folders to show new upload
+      } catch (error) {
+        console.error("Error uploading:", error);
+        Alert.alert("Upload Failed", "There was an issue uploading your content.");
+      }
+    } else {
+      Alert.alert("Please fill all fields and select an image.");
+    }
+  };
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.cardFooter}>
-          <Text style={styles.contributions}>{item.contributions} Contributions</Text>
-          <TouchableOpacity style={styles.addButton}>
-            <Ionicons name="add" size={18} color="white" />
-          </TouchableOpacity>
+      {item.isImage ? (
+        <Image source={{ uri: item.url }} style={styles.cardImage} />
+      ) : item.isText ? (
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>{item.id}</Text>
+          <Text style={styles.cardDescription}>{item.textContent}</Text>
         </View>
+      ) : null}
+      <View style={styles.cardFooter}>
+        <Text style={styles.contributions}>1 Contribution</Text>
+        <TouchableOpacity style={styles.addButton}>
+          <Ionicons name="add" size={18} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   );
+
+  const filteredData = data.filter(item =>
+    item.isText && item.id.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleFolderPress = (folderName) => {
+    router.push({
+      pathname: '/content',
+      params: { folder: folderName },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+          <Ionicons name="search" size={20} color="#4caf50" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search Community Topics"
+            placeholderTextColor="#888"
             value={search}
             onChangeText={setSearch}
           />
           <TouchableOpacity style={styles.filterButton}>
-            <Ionicons name="options-outline" size={24} color="#888" />
+            <Ionicons name="options-outline" size={24} color="#4caf50" />
           </TouchableOpacity>
         </View>
 
-        {/* FlatList for rendering cards */}
+        {/* Display Folders */}
+        <Text style={styles.folderHeader}>Available Folders</Text>
         <FlatList
-          data={data.filter(item => item.title.toLowerCase().includes(search.toLowerCase()))}
-          keyExtractor={item => item.id}
-          renderItem={renderCard}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
+          data={folders}
+          keyExtractor={folder => folder}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleFolderPress(item)}>
+              <Text style={styles.folderItem}>{item}</Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.folderList}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
+
+        {/* Loading and Error Handling */}
+        {loading ? null : error ? (
+          <Text>{error}</Text>
+        ) : filteredData.length === 0 ? (
+          <Text>No community present.</Text>
+        ) : (
+          <FlatList
+            data={filteredData}
+            keyExtractor={item => item.id}
+            renderItem={renderCard}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        )}
 
         {/* Pen Button for Asking Community */}
         <TouchableOpacity
           style={styles.penButton}
-          onPress={() => router.push('/addcommunity')}
+          onPress={() => setModalVisible(true)}
         >
           <Ionicons name="create" size={30} color="white" />
         </TouchableOpacity>
       </View>
+
+      {/* Modal for Uploading */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.title}>Upload to Community</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter title for folder"
+            placeholderTextColor="#888"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleImageChange}>
+            <Text style={styles.buttonText}>Choose Image</Text>
+          </TouchableOpacity>
+          {image && (
+            <View style={styles.imagePreview}>
+              <Image source={{ uri: image.uri }} style={styles.image} />
+              <Text style={styles.imageName}>{image.fileName}</Text>
+            </View>
+          )}
+          <TextInput
+            style={styles.textArea}
+            placeholder="Enter text content"
+            placeholderTextColor="#888"
+            value={textContent}
+            onChangeText={setTextContent}
+            multiline
+          />
+          <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
+            <Text style={styles.uploadButtonText}>Upload to Firebase</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.closeModal}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -153,102 +240,167 @@ const Community = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
   },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    padding: 20,
+    backgroundColor: '#ffffff',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F1F1',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginVertical: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   searchIcon: {
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
-    color: '#333',
+    color: '#000',
+    padding: 10,
   },
   filterButton: {
-    padding: 6,
+    padding: 5,
+  },
+  folderHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#4caf50',
+  },
+  folderItem: {
+    fontSize: 16,
+    marginVertical: 5,
+    padding: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  folderList: {
+    marginBottom: 20,
   },
   list: {
     paddingBottom: 20,
   },
   card: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     overflow: 'hidden',
-    flexDirection: 'row',
-    elevation: 4, // Add shadow for iOS
-    shadowColor: '#000', // Android shadow
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    marginVertical: 5,
+    elevation: 2,
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
-    resizeMode: 'cover',
+    width: '100%',
+    height: 200,
   },
   cardContent: {
-    flex: 1,
     padding: 10,
-    justifyContent: 'space-between',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 4,
-    color: '#333',
   },
   cardDescription: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    marginTop: 5,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#4caf50',
   },
   contributions: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
+    color: 'white',
   },
   addButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    padding: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#388e3c',
+    borderRadius: 5,
+    padding: 5,
   },
   penButton: {
     position: 'absolute',
     bottom: 30,
     right: 30,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4caf50',
     borderRadius: 50,
-    padding: 16,
+    padding: 15,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+  },
+  modalContainer: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#ffffff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#4caf50',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#4caf50',
+    paddingVertical: 15,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  imagePreview: {
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  imageName: {
+    color: '#555',
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  uploadButton: {
+    backgroundColor: '#388e3c',
+    paddingVertical: 15,
+    borderRadius: 5,
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  closeModal: {
+    color: '#4caf50',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
