@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getStorage, ref, listAll, uploadBytes } from 'firebase/storage';
+import { getStorage, ref, listAll, getDownloadURL, uploadBytes } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'expo-router';
@@ -21,7 +21,7 @@ const storage = getStorage(app);
 
 const Community = () => {
   const [search, setSearch] = useState('');
-  const [folders, setFolders] = useState([]);
+  const [posts, setPosts] = useState([]); // Now storing post data (image + title)
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -31,25 +31,57 @@ const Community = () => {
   const router = useRouter();
 
   useEffect(() => {
-    fetchFolders();
+    fetchPosts();
   }, []);
 
-  const fetchFolders = async () => {
+  // Fetch the posts with images and titles from Firebase storage
+  const fetchPosts = async () => {
     const storageRef = ref(storage, '/');
     try {
-      const folderList = await listAll(storageRef);
-      const folderNames = folderList.prefixes.map((folder) => folder.name);
-      setFolders(folderNames);
+      const result = await listAll(storageRef);
+      const postData = await Promise.all(
+        result.prefixes.map(async (folderRef) => {
+          try {
+            // List all files in the folder
+            const folderContents = await listAll(ref(storage, folderRef.fullPath));
+  
+            // Find the first image file (e.g., .jpg, .png)
+            const imageFile = folderContents.items.find(item => {
+              return item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.jpeg');
+            });
+  
+            if (imageFile) {
+              // Get the download URL of the found image
+              const imageUrl = await getDownloadURL(imageFile);
+              return {
+                title: folderRef.name, // Use folder name as the title
+                imageUrl, // Fetched image URL
+              };
+            } else {
+              console.warn(`No image found in folder: ${folderRef.name}`);
+              return null; // No image found in the folder, return null
+            }
+          } catch (error) {
+            console.error(`Error processing folder ${folderRef.name}:`, error);
+            return null; // Return null in case of any error
+          }
+        })
+      );
+      
+      // Filter out null values (folders without images)
+      const validPosts = postData.filter(post => post !== null);
+      
+      setPosts(validPosts);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching folders:", error);
+      console.error("Error fetching posts:", error);
       setLoading(false);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchFolders();
+    await fetchPosts();
     setRefreshing(false);
   };
 
@@ -60,9 +92,7 @@ const Community = () => {
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All, // Allow all media types
-      // allowsEditing: true,
-      // aspect: [4, 3],
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       quality: 1,
     });
     if (!result.cancelled) {
@@ -75,21 +105,20 @@ const Community = () => {
       const folderRef = ref(storage, `${title}/`);
       try {
         const response = await fetch(image.uri);
-        const blob = await response.blob(); // Convert to blob for upload
+        const blob = await response.blob();
         const imageRef = ref(folderRef, image.fileName);
         await uploadBytes(imageRef, blob);
-        console.log(`${image.fileName} uploaded successfully.`);
         
         const textBlob = new Blob([textContent], { type: 'text/plain' });
         const textRef = ref(folderRef, 'text_content.txt');
         await uploadBytes(textRef, textBlob);
-        console.log("Text content uploaded successfully.");
+        
         Alert.alert("Upload Successful", "Your image and text have been uploaded.");
         setImage(null);
         setTextContent('');
         setTitle('');
         setModalVisible(false);
-        fetchFolders();
+        fetchPosts();
       } catch (error) {
         console.error("Error uploading:", error);
         Alert.alert("Upload Failed", "There was an issue uploading your content.");
@@ -99,16 +128,16 @@ const Community = () => {
     }
   };
 
-  const handleFolderPress = (folderName) => {
+  const handlePostPress = (title) => {
     router.push({
       pathname: '/content',
-      params: { folder: folderName },
+      params: { folder: title },
     });
   };
 
-  // Filter folders based on search input
-  const filteredFolders = folders.filter(folder =>
-    folder.toLowerCase().includes(search.toLowerCase())
+  // Filter posts based on search input
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -129,17 +158,20 @@ const Community = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Display Folders */}
-        <Text style={styles.folderHeader}>Available Folders</Text>
+        {/* Display Posts */}
+        <Text style={styles.folderHeader}>Community Posts</Text>
         {loading ? (
           <Text>Loading...</Text>
         ) : (
           <FlatList
-            data={filteredFolders}
-            keyExtractor={folder => folder}
+            data={filteredPosts}
+            keyExtractor={post => post.title}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handleFolderPress(item)}>
-                <Text style={styles.folderItem}>{item}</Text>
+              <TouchableOpacity onPress={() => handlePostPress(item.title)}>
+                <View style={styles.postContainer}>
+                  <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
+                  <Text style={styles.postTitle}>{item.title}</Text>
+                </View>
               </TouchableOpacity>
             )}
             contentContainerStyle={styles.folderList}
@@ -168,7 +200,7 @@ const Community = () => {
           <Text style={styles.title}>Upload to Community</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter title for folder"
+            placeholder="Enter title for post"
             placeholderTextColor="#888"
             value={title}
             onChangeText={setTitle}
@@ -239,93 +271,113 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#4caf50',
   },
-  folderItem: {
-    fontSize: 16,
-    marginVertical: 5,
-    padding: 10,
+  postContainer: {
     backgroundColor: '#ffffff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderRadius: 10,
+    marginBottom: 15,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+  postImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  postTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
   folderList: {
-    marginBottom: 20,
+    paddingBottom: 100,
   },
   penButton: {
     position: 'absolute',
-    bottom: 30,
-    right: 30,
+    right: 20,
+    bottom: 20,
     backgroundColor: '#4caf50',
-    borderRadius: 50,
-    padding: 15,
-    elevation: 5,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 10,
   },
   modalContainer: {
-    flexGrow: 1,
+    flex: 1,
     padding: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#4caf50',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
     padding: 10,
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: '#4caf50',
-    paddingVertical: 15,
     borderRadius: 5,
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  imagePreview: {
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 5,
-  },
-  imageName: {
-    color: '#555',
+    marginBottom: 10,
+    color: '#000',
   },
   textArea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
     padding: 10,
-    marginBottom: 15,
+    borderRadius: 5,
+    marginBottom: 20,
+    color: '#000',
     height: 100,
     textAlignVertical: 'top',
   },
-  uploadButton: {
-    backgroundColor: '#388e3c',
-    paddingVertical: 15,
+  button: {
+    backgroundColor: '#4caf50',
+    padding: 15,
     borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  uploadButton: {
+    backgroundColor: '#4caf50',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
   },
   uploadButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
     textAlign: 'center',
+    fontWeight: 'bold',
   },
   closeModal: {
-    color: '#4caf50',
     textAlign: 'center',
+    color: '#4caf50',
     marginTop: 20,
+  },
+  imagePreview: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+  },
+  imageName: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#888',
   },
 });
 
