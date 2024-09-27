@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndi
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Firebase client-side config (public)
 const firebaseConfig = {
@@ -91,7 +92,7 @@ const Content = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="#4caf50" />
       ) : error ? (
@@ -123,7 +124,7 @@ const Content = () => {
           </View>
         </Modal>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

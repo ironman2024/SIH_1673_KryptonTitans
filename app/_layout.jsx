@@ -76,6 +76,7 @@ const RootLayout = () => {
         <Stack.Screen name='(tabs)' options={{ headerShown:false}} />
         <Stack.Screen name='(acc)' options={{ headerShown:false}} />
         <Stack.Screen name="(auth)" options={{headerShown:false}}/>
+        <Stack.Screen name="(pages)" options={{headerShown:false}}/>
       </Stack>
 
       <StatusBar style="dark"/>
