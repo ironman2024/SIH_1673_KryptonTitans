@@ -1,27 +1,32 @@
-import { useUser } from '@clerk/clerk-expo';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router'; // Import useRouter for redirection
-import '../../src/i18n/i18n.config'; // Import i18n config
-import LanguageModal from '../../common/LanguageModal'; // Import LanguageModal
+import { useRouter } from 'expo-router'; 
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import '../../src/i18n/i18n.config';
+import LanguageModal from '../../common/LanguageModal';
 
 const LanguageSelection = () => {
-  const { user } = useUser();
   const [langModalVisible, setLangModalVisible] = useState(false);
   const { t, i18n } = useTranslation();
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   // Handle language change from LanguageModal
-  const onSelectLang = (selectedLang) => {
-    const languageCode = selectedLang === 0 ? 'en' : 'hi'; // 0 -> English, 1 -> Hindi
-    i18n.changeLanguage(languageCode); // Change language dynamically
+  const onSelectLang = async (selectedLang) => {
+    const languageCode = selectedLang === 0 ? 'en' : 'hi';
+    i18n.changeLanguage(languageCode);
+    
+    try {
+      // Save the selected language to AsyncStorage
+      await AsyncStorage.setItem('selectedLanguage', languageCode);
+    } catch (err) {
+      console.error('Failed to save language preference', err);
+    }
   };
 
-  // Handle "Next" button press to navigate to the Home screen
   const handleNextPress = () => {
-    router.replace('/home'); // Redirect to the Home screen
+    router.replace('/home');
   };
 
   return (
@@ -29,13 +34,13 @@ const LanguageSelection = () => {
       <ScrollView style={{ height: '100%' }}>
         <View>
           <Text style={styles.welcomeText}>{t('Welcome')}</Text>
-          <Text style={styles.userText}>{user?.fullName}</Text>
 
           {/* Next button for redirection */}
           <TouchableOpacity style={styles.buttonText} onPress={handleNextPress}>
             <Text>{t('Next')}</Text>
           </TouchableOpacity>
 
+          {/* Button to open LanguageModal */}
           <TouchableOpacity
             style={styles.selectLanguageBtn}
             onPress={() => setLangModalVisible(!langModalVisible)}
@@ -43,11 +48,11 @@ const LanguageSelection = () => {
             <Text style={styles.selectLanguageText}>{t('Change Language')}</Text>
           </TouchableOpacity>
 
-          {/* Language selection modal */}
+          {/* Language Modal */}
           <LanguageModal
             langModalVisible={langModalVisible}
             setLangModalVisible={setLangModalVisible}
-            onSelectLang={onSelectLang} // Pass the handler to LanguageModal
+            onSelectLang={onSelectLang}
           />
         </View>
       </ScrollView>

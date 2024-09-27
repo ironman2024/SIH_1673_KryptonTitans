@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Redirect, router } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
-import { useTranslation } from 'react-i18next';  // Import useTranslation hook
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import Weather from './../../components/weather';  // Your existing Weather component
 
 const HomeScreen = () => {
   const { user, isLoaded } = useUser();
-  const { t } = useTranslation();  // Initialize the translation hook
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    const loadLanguagePreference = async () => {
+      try {
+        // Retrieve the saved language from AsyncStorage
+        const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
+        if (savedLanguage) {
+          i18n.changeLanguage(savedLanguage);
+        }
+      } catch (err) {
+        console.error('Failed to load language preference', err);
+      }
+    };
+
+    loadLanguagePreference();
+  }, []);
 
   if (!isLoaded) {
     return null; // or a loading spinner
@@ -18,24 +36,24 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.welcomeText}>
-          {t('Welcome')}, {user?.fullName} 
+          {t('Welcome')}, {user?.fullName}
         </Text>
 
         {/* Top Section: Location */}
         <TopSection />
 
         {/* Weather Update Section */}
-        
+        <Weather />
 
         {/* Crop Alerts Section */}
         <CropAlerts />
 
         {/* Spreading Diseases Section */}
-        <SectionHeader title={t('spreadingDiseases')} /> 
-        {/* <DiseaseCardScroll /> */}
+        <SectionHeader title="Spreading Diseases" />
+        <DiseaseCardScroll />
 
         {/* Farming Tips Section */}
-        <SectionHeader title={t('farmingTips')} />
+        <SectionHeader title="Farming Tips" />
         <FarmingTips />
 
         {/* Contact Helpline Section */}
@@ -54,46 +72,33 @@ const HomeScreen = () => {
 };
 
 // Top Section: Location and Icon
-const TopSection = () => {
-  const { t } = useTranslation();  // Translation hook
-
-  return (
-    <View style={styles.topSectionContainer}>
-      <Ionicons name="location-outline" size={28} color="#4CAF50" style={styles.locationIcon} />
-      <Text style={styles.locationText}>{t('location')}: Pune, Maharashtra</Text>
-    </View>
-  );
-};
-
-// Weather Update Component
+const TopSection = () => (
+  <View style={styles.topSectionContainer}>
+    <Ionicons name="location-outline" size={28} color="#4CAF50" style={styles.locationIcon} />
+    <Text style={styles.locationText}>Pune, Maharashtra</Text>
+  </View>
+);
 
 // Crop Alerts Component
-const CropAlerts = () => {
-  const { t } = useTranslation();  // Translation hook
-
-  return (
-    <View style={styles.alertContainer}>
-      <Ionicons name="alert-circle-outline" size={28} color="#E53935" />
-      <View style={styles.alertTextContainer}>
-        <Text style={styles.alertTitle}>{t('cropAlerts')}</Text>
-        <Text style={styles.alertDetails}>{t('blightDiseaseDetected')}</Text>
-      </View>
+const CropAlerts = () => (
+  <View style={styles.alertContainer}>
+    <Ionicons name="alert-circle-outline" size={28} color="#E53935" />
+    <View style={styles.alertTextContainer}>
+      <Text style={styles.alertTitle}>Crop Alerts</Text>
+      <Text style={styles.alertDetails}>Blight disease detected in your region</Text>
     </View>
-  );
-};
+  </View>
+);
 
 // Section Header Component
-const SectionHeader = ({ title }) => {
-  const { t } = useTranslation(); // Ensure translation is available here
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <TouchableOpacity activeOpacity={0.7}>
-        <Text style={styles.seeAllText}>{t('seeAll')}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+const SectionHeader = ({ title }) => (
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>{title}</Text>
+    <TouchableOpacity activeOpacity={0.7}>
+      <Text style={styles.seeAllText}>See all</Text>
+    </TouchableOpacity>
+  </View>
+);
 
 // Disease Card Scroll Component
 const DiseaseCardScroll = () => (
@@ -117,42 +122,65 @@ const DiseaseCardScroll = () => (
   </ScrollView>
 );
 
+// Disease Card Component
+const DiseaseCard = ({ icon, imageUri, title, subtitle, description, color }) => (
+  <TouchableOpacity style={[styles.diseaseCard, { borderColor: color }]}>
+    <View style={styles.diseaseHeader}>
+      <Ionicons name={icon} size={24} color={color} />
+      <Text style={[styles.diseaseTitle, { color }]}>{title}</Text>
+    </View>
+    <Image source={{ uri: imageUri }} style={styles.diseaseImage} />
+    <Text style={styles.diseaseSubtitle}>{subtitle}</Text>
+    <Text style={styles.diseaseDescription}>{description}</Text>
+    <TouchableOpacity style={styles.readMoreButton}>
+      <Text style={[styles.readMoreText, { color }]}>Read more</Text>
+      <Ionicons name="arrow-forward-circle-outline" size={20} color={color} />
+    </TouchableOpacity>
+  </TouchableOpacity>
+);
+
 // Farming Tips Component
 const FarmingTips = () => (
   <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.tipsScroll}>
-    {/* <TipCard
+    <TipCard
       icon="water-outline"
-      title={t('wateringSchedule')}  
-      description={t('optimalWateringTimes')}  
+      title="Watering Schedule"
+      description="Optimal times to water crops for best results."
       color="#4CAF50"
     />
     <TipCard
       icon="leaf-outline"
-      title={t('soilHealth')}  
-      description={t('balancedSoilNutrients')}  
+      title="Soil Health"
+      description="Maintain balanced soil nutrients for healthy crops."
       color="#8BC34A"
     />
     <TipCard
       icon="bug-outline"
-      title={t('pestControl')}  
-      description={t('naturalPestRemedies')}  
+      title="Pest Control"
+      description="Use natural remedies to manage pests."
       color="#FF9800"
-    /> */}
+    />
   </ScrollView>
 );
 
+// Tip Card Component
+const TipCard = ({ icon, title, description, color }) => (
+  <View style={[styles.tipCard, { backgroundColor: color }]}>
+    <Ionicons name={icon} size={24} color="#FFF" />
+    <Text style={styles.tipTitle}>{title}</Text>
+    <Text style={styles.tipDescription}>{description}</Text>
+  </View>
+);
+
 // Contact Helpline Component
-const ContactHelpline = () => {
-  const { t } = useTranslation();  // Translation hook
+const ContactHelpline = () => (
+  <View style={styles.contactContainer}>
+    <Ionicons name="call-outline" size={28} color="#4CAF50" />
+    <Text style={styles.contactText}>Contact Expert for Help</Text>
+  </View>
+);
 
-  return (
-    <View style={styles.contactContainer}>
-      <Ionicons name="call-outline" size={28} color="#4CAF50" />
-      <Text style={styles.contactText}>{t('contactExpertForHelp')}</Text>
-    </View>
-  );
-};
-
+// Add your styles below
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -167,7 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingVertical: 20,
     textAlign: 'center',
-    color: '#4caf50',
+    color: '#4CAF50',
   },
   topSectionContainer: {
     flexDirection: 'row',
@@ -189,30 +217,6 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 18,
     color: '#333',
-  },
-  weatherContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  weatherTextContainer: {
-    marginLeft: 10,
-  },
-  weatherText: {
-    fontSize: 18,
-    color: '#333',
-  },
-  weatherDetails: {
-    fontSize: 14,
-    color: '#888',
   },
   alertContainer: {
     flexDirection: 'row',
@@ -250,13 +254,78 @@ const styles = StyleSheet.create({
   diseaseCardScroll: {
     marginVertical: 12,
   },
+  diseaseCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    marginRight: 16,
+    width: 250,
+    borderWidth: 1.5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  diseaseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  diseaseTitle: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  diseaseImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  diseaseSubtitle: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  diseaseDescription: {
+    fontSize: 12,
+    color: '#777',
+  },
+  readMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  readMoreText: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+  tipsScroll: {
+    marginVertical: 16,
+  },
+  tipCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginRight: 16,
+    width: 180,
+  },
+  tipTitle: {
+    fontSize: 16,
+    color: '#FFF',
+    marginTop: 8,
+  },
+  tipDescription: {
+    fontSize: 14,
+    color: '#FFF',
+    marginTop: 4,
+  },
   contactContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
-    padding: 12,
+    backgroundColor: '#F1F8E9',
+    padding: 16,
     borderRadius: 12,
-    marginBottom: 20,
+    marginTop: 20,
   },
   contactText: {
     marginLeft: 10,
@@ -268,13 +337,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     backgroundColor: '#4CAF50',
+    padding: 16,
     borderRadius: 50,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
+    elevation: 5,
   },
 });
 
