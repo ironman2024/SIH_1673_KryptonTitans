@@ -35,7 +35,7 @@ const Index = () => {
       {user ? (
         <Redirect href={'/(tabs)/home'} />
       ) : (
-        <Redirect href={'/Login/LoginScreen'} />
+        <Redirect href={'/(auth)/LoginScreen'} />
       )}
     </View>
     </>

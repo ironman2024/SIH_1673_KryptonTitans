@@ -1,9 +1,9 @@
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
-import LanguageModal from '../../common/LanguageModal'; // Import from common folder
+import LanguageModal from '../common/LanguageModal'; // Import from common folder
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import '../../src/i18n/i18n.config'; // Import i18n config to initialize translations
+import '../src/i18n/i18n.config'; // Import i18n config to initialize translations
 
 const Home = () => {
   const [langModalVisible, setLangModalVisible] = useState(false);
