@@ -35,25 +35,19 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.welcomeText}>
-          {t('Welcome')}, {user?.fullName}
-        </Text>
-
-        {/* Top Section: Location */}
-        <TopSection />
 
         {/* Weather Update Section */}
         <Weather />
 
         {/* Crop Alerts Section */}
-        <CropAlerts />
+        <CropAlerts t={t}/>
 
         {/* Spreading Diseases Section */}
-        <SectionHeader title="Spreading Diseases" />
-        <DiseaseCardScroll />
+        <SectionHeader title={t("Spreading Diseases")} t={t}/>
+        <DiseaseCardScroll t={t}/>
 
         {/* Farming Tips Section */}
-        <SectionHeader title="Farming Tips" />
+        <SectionHeader title={t("Farming Tips")} />
         <FarmingTips />
 
         {/* Contact Helpline Section */}
@@ -80,25 +74,29 @@ const TopSection = () => (
 );
 
 // Crop Alerts Component
-const CropAlerts = () => (
+const CropAlerts = ({t}) => (
   <View style={styles.alertContainer}>
     <Ionicons name="alert-circle-outline" size={28} color="#E53935" />
     <View style={styles.alertTextContainer}>
-      <Text style={styles.alertTitle}>Crop Alerts</Text>
-      <Text style={styles.alertDetails}>Blight disease detected in your region</Text>
+      <Text style={styles.alertTitle}>{t("Crop Alerts")}</Text>
+      <Text style={styles.alertDetails}>{t('Blight disease detected in your region')}</Text>
     </View>
   </View>
 );
 
-// Section Header Component
-const SectionHeader = ({ title }) => (
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <TouchableOpacity activeOpacity={0.7}>
-      <Text style={styles.seeAllText}>See all</Text>
-    </TouchableOpacity>
-  </View>
-);
+const SectionHeader = ({ title, t }) => {
+  console.log(t); // Should log the translation function
+  const translatedTitle = t ? t(title) : 'Default Title'; // Use default if t is not available
+
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{translatedTitle}</Text>
+      <TouchableOpacity activeOpacity={0.7}>
+        <Text style={styles.seeAllText}>{t ? t('See all') : 'See all'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 // Disease Card Scroll Component
 const DiseaseCardScroll = () => (
@@ -106,7 +104,7 @@ const DiseaseCardScroll = () => (
     <DiseaseCard
       icon="bug-outline"
       imageUri="https://www.apsnet.org/edcenter/disandpath/fungalasco/pdlessons/PublishingImages/AppleScab01sm.jpg"
-      title="Apple Scab"
+      title='Apple Scab'
       subtitle="A fungal infection affecting apple trees."
       description="Apple scab is caused by a fungus that affects the leaves, fruits, and flowers of apple trees, leading to dark lesions."
       color="#FF6F00"
@@ -190,18 +188,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingVertical: 20,
-    textAlign: 'center',
-    color: '#4CAF50',
-  },
   topSectionContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F5F5F5', // Soft background color
     paddingVertical: 16,
     borderRadius: 12,
     marginVertical: 20,
@@ -216,7 +207,34 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 18,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#333', // Darker color for better readability
+  },
+  weatherContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  weatherTextContainer: {
+    marginLeft: 10,
+  },
+  weatherText: {
+    fontSize: 18,
     color: '#333',
+    fontFamily: 'Poppins-SemiBold',
+  },
+  weatherDetails: {
+    fontSize: 14,
+    color: '#888',
+    fontFamily: 'Poppins-Regular',
   },
   alertContainer: {
     flexDirection: 'row',
@@ -232,10 +250,12 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 16,
     color: '#E53935',
+    fontFamily: 'Poppins-SemiBold',
   },
   alertDetails: {
     fontSize: 14,
     color: '#333',
+    fontFamily: 'Poppins-Regular',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -246,10 +266,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     color: '#333',
+    fontFamily: 'Poppins-SemiBold',
   },
   seeAllText: {
     color: '#4CAF50',
     fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
   },
   diseaseCardScroll: {
     marginVertical: 12,
@@ -263,8 +285,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     elevation: 3,
   },
   diseaseHeader: {
@@ -273,73 +295,93 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   diseaseTitle: {
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: 'Poppins-SemiBold',
     marginLeft: 8,
   },
   diseaseImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 12,
-    marginBottom: 8,
+    height: 120,
+    borderRadius: 10,
+    marginVertical: 10,
   },
   diseaseSubtitle: {
-    fontSize: 14,
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    color: '#888',
   },
   diseaseDescription: {
-    fontSize: 12,
-    color: '#777',
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#333',
+    marginTop: 8,
   },
   readMoreButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
   readMoreText: {
     fontSize: 14,
     marginRight: 4,
+    fontFamily: 'Poppins-Regular',
   },
   tipsScroll: {
-    marginVertical: 16,
+    marginVertical: 12,
   },
   tipCard: {
+    borderRadius: 10,
     padding: 16,
-    borderRadius: 12,
     marginRight: 16,
     width: 180,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
   tipTitle: {
     fontSize: 16,
     color: '#FFF',
+    fontFamily: 'Poppins-SemiBold',
     marginTop: 8,
   },
   tipDescription: {
     fontSize: 14,
     color: '#FFF',
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
     marginTop: 4,
   },
   contactContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F8E9',
-    padding: 16,
+    backgroundColor: '#E8F5E9',
+    padding: 12,
     borderRadius: 12,
-    marginTop: 20,
+    marginBottom: 20,
   },
   contactText: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#333',
+    color: '#4CAF50',
+    fontFamily: 'Poppins-SemiBold',
   },
   chatbotButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: 30,
+    right: 30,
     backgroundColor: '#4CAF50',
-    padding: 16,
     borderRadius: 50,
+    padding: 16,
     elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
