@@ -99,39 +99,41 @@ const SectionHeader = ({ title, t }) => {
 };
 
 // Disease Card Scroll Component
-const DiseaseCardScroll = () => (
+const DiseaseCardScroll = ({ t }) => (
   <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.diseaseCardScroll}>
     <DiseaseCard
       icon="bug-outline"
       imageUri="https://www.apsnet.org/edcenter/disandpath/fungalasco/pdlessons/PublishingImages/AppleScab01sm.jpg"
-      title='Apple Scab'
-      subtitle="A fungal infection affecting apple trees."
-      description="Apple scab is caused by a fungus that affects the leaves, fruits, and flowers of apple trees, leading to dark lesions."
+      title={t('Apple Scab')}  // Use t for title
+      subtitle={t('A fungal infection affecting apple trees.')} // Use t for subtitle
+      description={t('Apple scab is caused by a fungus that affects the leaves, fruits, and flowers of apple trees, leading to dark lesions.')} // Use t for description
       color="#FF6F00"
+      t={t}
     />
     <DiseaseCard
       icon="leaf-outline"
       imageUri="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTha6BOe-NeS7HWl1UawWt08uHZHz2RZpXuaA&s"
-      title="Panama Disease"
-      subtitle="A soil-borne fungal disease."
-      description="This disease affects bananas and causes wilting, often leading to the death of the plants."
+      title={t('Panama Disease')} // Use t for title
+      subtitle={t('A soil-borne fungal disease.')} // Use t for subtitle
+      description={t('This disease affects bananas and causes wilting, often leading to the death of the plants.')} // Use t for description
       color="#D32F2F"
+      t={t}
     />
   </ScrollView>
 );
 
 // Disease Card Component
-const DiseaseCard = ({ icon, imageUri, title, subtitle, description, color }) => (
+const DiseaseCard = ({ icon, imageUri, title, subtitle, description, color, t }) => (
   <TouchableOpacity style={[styles.diseaseCard, { borderColor: color }]}>
     <View style={styles.diseaseHeader}>
       <Ionicons name={icon} size={24} color={color} />
-      <Text style={[styles.diseaseTitle, { color }]}>{title}</Text>
+      <Text style={[styles.diseaseTitle, { color }]}>{t(title)}</Text>
     </View>
     <Image source={{ uri: imageUri }} style={styles.diseaseImage} />
-    <Text style={styles.diseaseSubtitle}>{subtitle}</Text>
-    <Text style={styles.diseaseDescription}>{description}</Text>
+    <Text style={styles.diseaseSubtitle}>{t(subtitle)}</Text>
+    <Text style={styles.diseaseDescription}>{t(description)}</Text>
     <TouchableOpacity style={styles.readMoreButton}>
-      <Text style={[styles.readMoreText, { color }]}>Read more</Text>
+      <Text style={[styles.readMoreText, { color }]}>{t('readMore')}</Text>
       <Ionicons name="arrow-forward-circle-outline" size={20} color={color} />
     </TouchableOpacity>
   </TouchableOpacity>
