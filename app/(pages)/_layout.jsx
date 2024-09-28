@@ -7,7 +7,7 @@ const AuthLayout = () => {
     <>
       <Stack>
         <Stack.Screen
-          name='chatbot'
+          name='bot'
           options={{
             headerShown: false
           }}  

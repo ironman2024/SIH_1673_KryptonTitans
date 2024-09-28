@@ -54,7 +54,7 @@ const HomeScreen = () => {
       {/* Floating Chatbot Icon */}
       <TouchableOpacity
         style={styles.chatbotButton}
-        onPress={() => router.push('/chatbot')}  // Route to chatbot
+        onPress={() => router.push('/bot')}  // Route to chatbot
       >
         <Ionicons name="chatbubbles" size={30} color="#FFFFFF" />
       </TouchableOpacity>
