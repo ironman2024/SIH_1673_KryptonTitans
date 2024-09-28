@@ -71,11 +71,6 @@ export default function Account() {
         <Text style={styles.menuText}>About</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/community')}>
-        <Icon name="wifi" size={24} color="#000" />
-        <Text style={styles.menuText}>Your Contributions</Text>
-      </TouchableOpacity>
-
       {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={() => alert('Logged Out')}>
         <Icon name="logout" size={24} color="#fff" />
@@ -120,7 +115,7 @@ export default function Account() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f9f9f9',
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -165,6 +160,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 30,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   logoutText: {
     color: 'white',
@@ -175,29 +175,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   modalContent: {
-    width: '80%',
+    width: '85%',
     backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
+    padding: 30,
+    borderRadius: 15,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 25,
+    color: '#4CAF50',
   },
   languageButton: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderWidth: 1,
     borderColor: '#4CAF50',
-    borderRadius: 5,
-    marginVertical: 10,
+    borderRadius: 8,
+    marginVertical: 12,
     width: '100%',
     alignItems: 'center',
+    backgroundColor: '#f1f1f1',
   },
   selectedLanguageButton: {
     backgroundColor: '#4CAF50',
@@ -207,10 +214,11 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   closeButton: {
-    marginTop: 20,
+    marginTop: 25,
   },
   closeButtonText: {
     color: '#4CAF50',
     fontSize: 16,
+    textDecorationLine: 'underline',
   },
 });

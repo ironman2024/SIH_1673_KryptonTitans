@@ -14,14 +14,14 @@ const categories = [
 ];
 
 const categoryColors = {
-  'Cereals': '#C6DAB6',  // Soft Olive Green
-  'Cows Disease': '#F2B2B2',  // Soft Salmon Pink
-  'Sheep Diseases': '#A4C8E1',  // Sky Blue
-  'Fruit Diseases': '#D4E8B3',  // Light Mint Green
-  'Poultry Diseases': '#F6D1D1',  // Peach
-  'Soil Health': '#E3D49B',  // Pale Tan
-  'Insect Pests': '#F3CBA0',  // Light Coral
-  'Tree Diseases': '#C2E1D4',  // Minty Green
+  'Cereals': '#C6DAB6',
+  'Cows Disease': '#F2B2B2',
+  'Sheep Diseases': '#A4C8E1',
+  'Fruit Diseases': '#D4E8B3',
+  'Poultry Diseases': '#F6D1D1',
+  'Soil Health': '#E3D49B',
+  'Insect Pests': '#F3CBA0',
+  'Tree Diseases': '#C2E1D4',
 };
 
 const Explore = () => {
@@ -65,7 +65,7 @@ const Explore = () => {
           </View>
         ) : (
           <>
-            <Text style={styles.sectionTitle}>Disease Categories</Text>
+            <Text style={styles.sectionTitle}>Plant and Livelihood Diseases</Text>
             {filteredCategories.length > 0 ? (
               <FlatList
                 data={filteredCategories}
@@ -91,18 +91,18 @@ const Explore = () => {
         <Modal
           visible={modalVisible}
           transparent={true}
-          animationType="slide"
+          animationType="fade"
           onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>{selectedCategory?.name}</Text>
-            <Image source={selectedCategory?.image} style={styles.modalImage} />
-            <Text style={styles.modalContent}>
-              {selectedCategory?.details}
-            </Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalCloseButton}>Close</Text>
-            </TouchableOpacity>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>{selectedCategory?.name}</Text>
+              <Image source={selectedCategory?.image} style={styles.modalImage} />
+              <Text style={styles.modalContent}>{selectedCategory?.details}</Text>
+              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalCloseText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>
@@ -180,41 +180,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
-  modalView: {
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 20,
+    padding: 20,
+  },
+  modalView: {
+    width: '90%',
     backgroundColor: '#FFF',
-    borderRadius: 10,
-    padding: 30,
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 5,
+    elevation: 10,
   },
   modalTitle: {
     fontSize: 24,
     fontWeight: '600',
-    marginBottom: 20,
+    marginBottom: 15,
     color: '#333',
   },
   modalImage: {
-    width: 200,
+    width: '100%',
     height: 200,
-    borderRadius: 15,
+    borderRadius: 12,
     marginBottom: 15,
+    resizeMode: 'cover',
   },
   modalContent: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    marginBottom: 20,
   },
   modalCloseButton: {
+    backgroundColor: '#53B175',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalCloseText: {
     fontSize: 16,
-    color: '#53B175',
-    marginTop: 20,
+    color: '#FFF',
+    fontWeight: '500',
   },
   noResultsText: {
     fontSize: 16,

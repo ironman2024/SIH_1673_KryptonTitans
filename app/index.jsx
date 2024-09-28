@@ -26,8 +26,6 @@ const Index = () => {
       </View>
     );
   }
-  
- 
 
   return (
     <>

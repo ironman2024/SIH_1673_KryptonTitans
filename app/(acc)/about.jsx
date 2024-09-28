@@ -62,7 +62,6 @@ export default function About() {
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Icon name="arrow-back" size={24} color="#fff" />
-        <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -102,15 +101,13 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2196F3',
-    paddingVertical: 15,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
     justifyContent: 'center',
     borderRadius: 10,
     marginTop: 30,
-  },
-  backButtonText: {
-    color: 'white',
-    marginLeft: 10,
-    fontSize: 16,
+    width: 50, // Adjust width as necessary
+    alignSelf: 'flex-start',
   },
 });
+

@@ -39,9 +39,6 @@ const HomeScreen = () => {
         {/* Weather Update Section */}
         <Weather />
 
-        {/* Crop Alerts Section */}
-        <CropAlerts t={t}/>
-
         {/* Spreading Diseases Section */}
         <SectionHeader title={t("Spreading Diseases")} t={t}/>
         <DiseaseCardScroll t={t}/>
@@ -70,17 +67,6 @@ const TopSection = () => (
   <View style={styles.topSectionContainer}>
     <Ionicons name="location-outline" size={28} color="#4CAF50" style={styles.locationIcon} />
     <Text style={styles.locationText}>Pune, Maharashtra</Text>
-  </View>
-);
-
-// Crop Alerts Component
-const CropAlerts = ({t}) => (
-  <View style={styles.alertContainer}>
-    <Ionicons name="alert-circle-outline" size={28} color="#E53935" />
-    <View style={styles.alertTextContainer}>
-      <Text style={styles.alertTitle}>{t("Crop Alerts")}</Text>
-      <Text style={styles.alertDetails}>{t('Blight disease detected in your region')}</Text>
-    </View>
   </View>
 );
 
@@ -236,27 +222,6 @@ const styles = StyleSheet.create({
   weatherDetails: {
     fontSize: 14,
     color: '#888',
-    fontFamily: 'Poppins-Regular',
-  },
-  alertContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF3F3',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  alertTextContainer: {
-    marginLeft: 10,
-  },
-  alertTitle: {
-    fontSize: 16,
-    color: '#E53935',
-    fontFamily: 'Poppins-SemiBold',
-  },
-  alertDetails: {
-    fontSize: 14,
-    color: '#333',
     fontFamily: 'Poppins-Regular',
   },
   sectionHeader: {
