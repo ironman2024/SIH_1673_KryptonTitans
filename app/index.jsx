@@ -33,7 +33,7 @@ const Index = () => {
       {user ? (
         <Redirect href={'/(tabs)/home'} />
       ) : (
-        <Redirect href={'/(auth)/LoginScreen'} />
+        <Redirect href={'/(auth)/LanguageSelection'} />
       )}
     </View>
     </>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView,Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router'; 
@@ -26,27 +26,47 @@ const LanguageSelection = () => {
   };
 
   const handleNextPress = () => {
-    router.replace('/home');
+    router.replace('/LoginScreen');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={{ height: '100%' }}>
         <View>
-          <Text style={styles.welcomeText}>{t('Welcome')}</Text>
-
-          {/* Next button for redirection */}
-          <TouchableOpacity style={styles.buttonText} onPress={handleNextPress}>
-            <Text>{t('Next')}</Text>
-          </TouchableOpacity>
-
-          {/* Button to open LanguageModal */}
-          <TouchableOpacity
+        <Image
+        
+            source={require('./../../assets/images/logotext.png')}
+            style={{
+              width: 300,
+              height: 150,
+              alignSelf: 'center',
+              marginBottom: 20,
+              marginTop:250
+            }}
+            resizeMode="contain"
+          />
+           {/* Button to open LanguageModal */}
+           <TouchableOpacity
             style={styles.selectLanguageBtn}
             onPress={() => setLangModalVisible(!langModalVisible)}
           >
             <Text style={styles.selectLanguageText}>{t('Change Language')}</Text>
           </TouchableOpacity>
+          
+          
+
+
+          {/* Next button for redirection */}
+          <TouchableOpacity style={styles.buttonText} onPress={handleNextPress}>
+            <Text
+            style={{
+              textAlign:'center',
+              color:'#FAF7F0'
+             
+            }}>{t('Sign Up')}</Text>
+          </TouchableOpacity>
+
+         
 
           {/* Language Modal */}
           <LanguageModal
@@ -85,22 +105,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: '#347928',
     padding: 15,
-    borderRadius: 5,
-    color: '#fff',
+    borderRadius: 90,
+    
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 10,
     marginHorizontal: 20,
     elevation: 5,
+    
   },
   selectLanguageBtn: {
     width: '70%',
     height: 50,
-    backgroundColor: '#4B68E9',
+    backgroundColor: '#FAF7F0',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 140,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -113,6 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textTransform: 'uppercase',
+    color:'#181C14'
   },
 });
 

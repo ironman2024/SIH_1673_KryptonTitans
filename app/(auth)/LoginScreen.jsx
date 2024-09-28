@@ -26,7 +26,7 @@ export default function LoginScreen() {
   const onPress = useCallback(async () => {
     try {
       const { createdSessionId } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/(auth)/LanguageSelection', { scheme: 'myapp' }),
+        redirectUrl: Linking.createURL('/(tabs)/home', { scheme: 'myapp' }),
       });
 
       if (createdSessionId) {
@@ -53,7 +53,7 @@ export default function LoginScreen() {
         <View style={styles.content}>
           {/* Logo */}
           <Image
-            source={require('./../../assets/images/logo.png')}
+            source={require('./../../assets/images/logotext.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -106,9 +106,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: 50,
-    height: 50,
-    marginBottom: 30,
+    width: 250,
+    height: 250,
+    marginBottom: 10,
   },
   textContainer: {},
   title: {

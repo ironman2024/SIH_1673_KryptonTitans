@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ const ImageUploader = () => {
   const [imageUri, setImageUri] = useState(null);
   const [prediction, setPrediction] = useState('');
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Function to ask for permissions and select image from the library
   const selectImage = async () => {
@@ -22,8 +23,6 @@ const ImageUploader = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
-      allowsEditing: true,
-      aspect: [4, 3],
     });
 
     if (!result.canceled) {
@@ -53,7 +52,7 @@ const ImageUploader = () => {
     });
 
     try {
-      const response = await axios.post('http://192.168.205.121:5000/classify_image', formData, {
+      const response = await axios.post('http://192.168.82.121:5000/classify_image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -68,9 +67,22 @@ const ImageUploader = () => {
     }
   };
 
+  // Function to reset the uploads
+  const onRefresh = () => {
+    setRefreshing(true);
+    setImageUri(null);
+    setPrediction('');
+    setRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.container} 
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <Text style={styles.headerText}>Upload Image</Text>
 
         <View style={styles.imageUploadContainer}>
@@ -117,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: '#53B175',
     width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -135,7 +147,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   uploadImageButton: {
-    backgroundColor: '#007AFF', // Button color
+    backgroundColor: '#53B175', // Button color
     borderRadius: 25,
     paddingVertical: 15,
     paddingHorizontal: 40,
