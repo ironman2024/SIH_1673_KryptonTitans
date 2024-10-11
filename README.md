@@ -1,5 +1,3 @@
----
-
 # **Nectar - AI-Powered Agricultural Assistant**
 
 **Nectar** is an advanced AI-powered mobile application designed to revolutionize agricultural practices by offering real-time, intelligent solutions for diagnosing plant and livestock diseases. With an emphasis on farmers in rural and underserved areas, Nectar tackles challenges like limited expert access, disease management, and boosting crop and livestock productivity.
